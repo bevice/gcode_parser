@@ -8,6 +8,7 @@
 #include "gcode_tools.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 static gcode_hw_callbacks_struct *hw_callbacks = NULL;
 
@@ -56,38 +57,49 @@ char *get_arg_value(char *args, gcode_hw_arg_t *value) {
     return rstrip(args);
 }
 
+#define MAX_VARGS 4
+
+gcode_status_t gcode_parse_vargs(char *find, char *args, ...) {
+    va_list vl;
+    gcode_hw_arg_t *values[MAX_VARGS];
+    uint8_t i = 0;
+
+    va_start(vl, args);
+    while (find[i]) {
+        gcode_hw_arg_t *x = va_arg(vl, gcode_hw_arg_t*);
+        if (i < MAX_VARGS)
+            values[i] = x;
+        i++;
+    }
+    va_end(vl);
+
+    while (*args && *args != '\n' && *args != '\r') {
+        char argument = to_upper(*args);
+        uint8_t n = 0xFF;
+        //найдем аргумент в строке
+        for (i = 0; i < strlen(find); ++i)
+            if (to_upper(find[i]) == argument) {
+                n = i;
+                break;
+            }
+        gcode_hw_arg_t *t = NULL;
+        if (n != 0xFF)
+            t = values[n];
+        args = get_arg_value(args, t);
+        if (!args)
+            return GCODE_ARGUMENT_ERROR;
+    }
+    return GCODE_OK;
+
+
+}
+
 gcode_status_t gcode_g00(char *args) {
     static gcode_hw_arg_t x = 0, y = 0, z = 0, speed = 0;
     if (hw_callbacks->g00) {
-        char *pargs = rstrip(args);
-        // достаем координаты из аргументов
-        while (pargs && *pargs && *pargs != '\n') {
-            gcode_hw_arg_t *t = NULL;
-            switch (*pargs) {
-                case 'X':
-                case 'x':
-                    t = &x;
-                    break;
-                case 'Y':
-                case 'y':
-                    t = &y;
-                    break;
-                case 'F':
-                case 'f':
-                    t = &speed;
-                    break;
-                case 'Z':
-                case 'z':
-                    t = &z;
-                    break;
-                default:
-                    t = NULL;
-                    break;
-            }
-            pargs = get_arg_value(pargs, t);
-            if (!pargs) // если функция вернула пустой указатель, значит что-то не распарсилось!
-                return GCODE_ARGUMENT_ERROR;
-        }
+        gcode_status_t r = gcode_parse_vargs("XYZF", args, &x, &y, &z, &speed);
+        if (r != GCODE_OK)
+            return r;
         hw_callbacks->g00(x, y, z, speed);
         return GCODE_OK;
     }
@@ -98,35 +110,9 @@ gcode_status_t gcode_g00(char *args) {
 gcode_status_t gcode_g01(char *args) {
     static gcode_hw_arg_t x = 0, y = 0, z = 0, speed = 0;
     if (hw_callbacks->g01) {
-        char *pargs = rstrip(args);
-        // достаем координаты из аргументов
-        while (pargs && *pargs && *pargs != '\n') {
-            gcode_hw_arg_t *t = NULL;
-            switch (*pargs) {
-                case 'X':
-                case 'x':
-                    t = &x;
-                    break;
-                case 'Y':
-                case 'y':
-                    t = &y;
-                    break;
-                case 'F':
-                case 'f':
-                    t = &speed;
-                    break;
-                case 'Z':
-                case 'z':
-                    t = &z;
-                    break;
-                default:
-                    t = NULL;
-                    break;
-            }
-            pargs = get_arg_value(pargs, t);
-            if (!pargs) // если функция вернула пустой указатель, значит что-то не распарсилось!
-                return GCODE_ARGUMENT_ERROR;
-        }
+        gcode_status_t r = gcode_parse_vargs("XYZF", args, &x, &y, &z, &speed);
+        if (r != GCODE_OK)
+            return r;
         hw_callbacks->g01(x, y, z, speed);
         return GCODE_OK;
     }
@@ -144,27 +130,9 @@ gcode_status_t gcode_commands_init(gcode_hw_callbacks_struct *callbacks) {
 gcode_status_t gcode_g04(char *args) {
     static gcode_hw_arg_t time = 0;
     if (hw_callbacks->g04) {
-        char *pargs = rstrip(args);
-        // достаем координаты из аргументов
-        while (pargs && *pargs && *pargs != '\n') {
-            gcode_hw_arg_t *t = NULL;
-            switch (*pargs) {
-                case 'F':
-                case 'f':
-                    t = &time;
-                    break;
-                case 'P':
-                case 'p':
-                    t = &time;
-                    break;
-                default:
-                    t = NULL;
-                    break;
-            }
-            pargs = get_arg_value(pargs, t);
-            if (!pargs) // если функция вернула пустой указатель, значит что-то не распарсилось!
-                return GCODE_ARGUMENT_ERROR;
-        }
+        gcode_status_t r = gcode_parse_vargs("PF", args, &time, &time);
+        if (r != GCODE_OK)
+            return r;
         hw_callbacks->g04(time);
         return GCODE_OK;
     }
@@ -225,31 +193,9 @@ gcode_status_t gcode_g91(char *args) {
 gcode_status_t gcode_g92(char *args) {
     gcode_hw_arg_t x = GCODE_NO_VALUE, y = GCODE_NO_VALUE, z = GCODE_NO_VALUE;
     if (hw_callbacks->g92) {
-        char *pargs = rstrip(args);
-        // достаем координаты из аргументов
-        while (pargs && *pargs && *pargs != '\n') {
-            gcode_hw_arg_t *t = NULL;
-            switch (*pargs) {
-                case 'X':
-                case 'x':
-                    t = &x;
-                    break;
-                case 'Y':
-                case 'y':
-                    t = &y;
-                    break;
-                case 'Z':
-                case 'z':
-                    t = &z;
-                    break;
-                default:
-                    t = NULL;
-                    break;
-            }
-            pargs = get_arg_value(pargs, t);
-            if (!pargs) // если функция вернула пустой указатель, значит что-то не распарсилось!
-                return GCODE_ARGUMENT_ERROR;
-        }
+        gcode_status_t r = gcode_parse_vargs("XYZ", args, &x, &y, &z);
+        if (r != GCODE_OK)
+            return r;
         hw_callbacks->g92(x, y, z);
         return GCODE_OK;
     }
