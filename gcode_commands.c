@@ -8,7 +8,6 @@
 #include "gcode_tools.h"
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 
 static gcode_hw_callbacks_struct *hw_callbacks = NULL;
 
@@ -64,17 +63,21 @@ gcode_status_t gcode_g00(char *args) {
         // достаем координаты из аргументов
         while (pargs && *pargs) {
             gcode_hw_arg_t *t = NULL;
-            switch (toupper(*pargs)) {
+            switch (*pargs) {
                 case 'X':
+                case 'x':
                     t = &x;
                     break;
                 case 'Y':
+                case 'y':
                     t = &y;
                     break;
                 case 'F':
+                case 'f':
                     t = &speed;
                     break;
                 case 'Z':
+                case 'z':
                     t = &z;
                     break;
                 default:
@@ -99,17 +102,21 @@ gcode_status_t gcode_g01(char *args) {
         // достаем координаты из аргументов
         while (pargs && *pargs) {
             gcode_hw_arg_t *t = NULL;
-            switch (toupper(*pargs)) {
+            switch (*pargs) {
                 case 'X':
+                case 'x':
                     t = &x;
                     break;
                 case 'Y':
+                case 'y':
                     t = &y;
                     break;
                 case 'F':
+                case 'f':
                     t = &speed;
                     break;
                 case 'Z':
+                case 'z':
                     t = &z;
                     break;
                 default:
@@ -141,11 +148,13 @@ gcode_status_t gcode_g04(char *args) {
         // достаем координаты из аргументов
         while (pargs && *pargs) {
             gcode_hw_arg_t *t = NULL;
-            switch (toupper(*pargs)) {
+            switch (*pargs) {
                 case 'F':
+                case 'f':
                     t = &time;
                     break;
                 case 'P':
+                case 'p':
                     t = &time;
                     break;
                 default:
@@ -220,14 +229,17 @@ gcode_status_t gcode_g92(char *args) {
         // достаем координаты из аргументов
         while (pargs && *pargs) {
             gcode_hw_arg_t *t = NULL;
-            switch (toupper(*pargs)) {
+            switch (*pargs) {
                 case 'X':
+                case 'x':
                     t = &x;
                     break;
                 case 'Y':
+                case 'y':
                     t = &y;
                     break;
                 case 'Z':
+                case 'z':
                     t = &z;
                     break;
                 default:

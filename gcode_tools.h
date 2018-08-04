@@ -17,8 +17,7 @@ size_t gcode_argument_len(const char *const line);
 
 void gcode_clear_comment(char *line);
 
-char *rstrip(char *const line);
-
+char *rstrip(char *line);
 
 #ifdef __cplusplus
 }

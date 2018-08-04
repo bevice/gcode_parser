@@ -49,3 +49,4 @@ char *rstrip(char *const line) {
         first_sym++;
     return first_sym;
 }
+

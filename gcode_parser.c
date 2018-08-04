@@ -8,7 +8,6 @@
 #include "gcode_commands.h"
 #include "gcode_tools.h"
 #include <string.h>
-#include <ctype.h>
 #include "gcode.h"
 
 static gcode_worker_f last_command = NULL;
@@ -61,15 +60,19 @@ gcode_status_t gcode_parce_line(char *line) {
         return GCODE_OK;
 
     gcode_clear_comment(line);
-    *first_sym = (char) toupper(*first_sym);
     switch (*first_sym) {
 
         case 'G':
+        case 'g':
         case 'M':
+        case 'm':
             return gcode_run_code(first_sym);
         case 'X':
+        case 'x':
         case 'Y':
+        case 'y':
         case 'Z':
+        case 'z':
             return gcode_repeat_last(first_sym);
         default:
             return GCODE_UNKNOWN_LINE_TYPE;

@@ -7,7 +7,6 @@
 #include "gcode.h"
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 #include "gcode_commands.h"
 
 // test
