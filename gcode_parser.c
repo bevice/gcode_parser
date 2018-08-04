@@ -13,11 +13,20 @@
 
 static gcode_worker_f last_command = NULL;
 
-static gcode_parser_struct callbacks[] = {
+static const gcode_parser_struct callbacks[] = {
         {"G00", gcode_g00},
         {"G0",  gcode_g00}, // для тупых
         {"G01", gcode_g01},
         {"G1",  gcode_g01}, // для тупых
+        {"G04", gcode_g04},
+        {"G4",  gcode_g04}, // для тупых
+        {"G15", gcode_g15},
+        {"G16", gcode_g16},
+        {"G20", gcode_g20},
+        {"G21", gcode_g21},
+        {"G90", gcode_g90},
+        {"G91", gcode_g91},
+        {"G92", gcode_g92},
 };
 
 

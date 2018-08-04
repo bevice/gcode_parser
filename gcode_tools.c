@@ -45,7 +45,7 @@ size_t gcode_argument_len(const char *const line) {
  */
 char *rstrip(char *const line) {
     char *first_sym = line;
-    while (*first_sym == ' ')
+    while (*first_sym == ' ' || *first_sym == '\r')
         first_sym++;
     return first_sym;
 }
