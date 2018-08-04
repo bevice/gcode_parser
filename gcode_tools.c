@@ -50,3 +50,9 @@ char *rstrip(char *line) {
     return first_sym;
 }
 
+char to_upper(char v) {
+    if (v >= 'a' && v <= 'z')
+        v -= ('a' - 'A');
+    return v;
+}
+

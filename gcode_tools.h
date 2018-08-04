@@ -19,7 +19,7 @@ void gcode_clear_comment(char *line);
 
 char *rstrip(char *line);
 
-char *rlstrip(char *line);
+char to_upper(char v);
 #ifdef __cplusplus
 }
 #endif
