@@ -49,7 +49,6 @@ gcode_status_t gcode_repeat_last(char *line) {
 
 
 gcode_status_t gcode_parce_line(char *line) {
-    uint8_t code_len = 0;
 
     if (!line) return GCODE_ARGUMENT_ERROR; // нулевой указатель
     char *first_sym = rstrip(line);
