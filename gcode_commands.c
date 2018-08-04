@@ -17,7 +17,7 @@ char *get_arg_value(char *args, gcode_hw_arg_t *value) {
     gcode_hw_arg_t dummy_value;
     if (!value) value = &dummy_value;
     if (!args)return NULL;
-
+    if (*args == '\r' || *args == '\n')return args++;
     // находим первую цифру в строке
     while (*args && (*args < '0' || *args > '9') && *args != '-')
         args++;
@@ -61,7 +61,7 @@ gcode_status_t gcode_g00(char *args) {
     if (hw_callbacks->g00) {
         char *pargs = rstrip(args);
         // достаем координаты из аргументов
-        while (pargs && *pargs) {
+        while (pargs && *pargs && *pargs != '\n') {
             gcode_hw_arg_t *t = NULL;
             switch (*pargs) {
                 case 'X':
@@ -100,7 +100,7 @@ gcode_status_t gcode_g01(char *args) {
     if (hw_callbacks->g01) {
         char *pargs = rstrip(args);
         // достаем координаты из аргументов
-        while (pargs && *pargs) {
+        while (pargs && *pargs && *pargs != '\n') {
             gcode_hw_arg_t *t = NULL;
             switch (*pargs) {
                 case 'X':
@@ -146,7 +146,7 @@ gcode_status_t gcode_g04(char *args) {
     if (hw_callbacks->g04) {
         char *pargs = rstrip(args);
         // достаем координаты из аргументов
-        while (pargs && *pargs) {
+        while (pargs && *pargs && *pargs != '\n') {
             gcode_hw_arg_t *t = NULL;
             switch (*pargs) {
                 case 'F':
@@ -227,7 +227,7 @@ gcode_status_t gcode_g92(char *args) {
     if (hw_callbacks->g92) {
         char *pargs = rstrip(args);
         // достаем координаты из аргументов
-        while (pargs && *pargs) {
+        while (pargs && *pargs && *pargs != '\n') {
             gcode_hw_arg_t *t = NULL;
             switch (*pargs) {
                 case 'X':

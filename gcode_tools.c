@@ -43,7 +43,7 @@ size_t gcode_argument_len(const char *const line) {
  * Возвращает указатель на первый символ (игнорируются пробелы вначале)
  * @return
  */
-char *rstrip(char *const line) {
+char *rstrip(char *line) {
     char *first_sym = line;
     while (*first_sym == ' ' || *first_sym == '\r')
         first_sym++;

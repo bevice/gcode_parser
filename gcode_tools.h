@@ -19,6 +19,7 @@ void gcode_clear_comment(char *line);
 
 char *rstrip(char *line);
 
+char *rlstrip(char *line);
 #ifdef __cplusplus
 }
 #endif
