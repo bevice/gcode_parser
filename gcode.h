@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-typedef float gcode_hw_arg_t;
+typedef double gcode_hw_arg_t;
 typedef void gcode_hw_return_t;
 
 #define GCODE_NO_VALUE (9e99)
