@@ -202,3 +202,18 @@ gcode_status_t gcode_g92(char *args) {
 
     return GCODE_HARDWARE_DOES_NOT_SUPPORT;
 }
+
+gcode_status_t gcode_m51(char *args) {
+    static gcode_hw_arg_t
+            r = 0,
+            g = 0,
+            b = 0;
+    if (hw_callbacks->m51) {
+        gcode_status_t res = gcode_parse_vargs("RGB", args, &r, &g, &b);
+        if (res != GCODE_OK)
+            return res;
+        hw_callbacks->m51(r, g, b);
+
+    }
+    return GCODE_HARDWARE_DOES_NOT_SUPPORT;
+}

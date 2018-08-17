@@ -58,6 +58,7 @@ typedef struct {
 
     gcode_hw_return_t (*g92)(gcode_hw_arg_t x, gcode_hw_arg_t y, gcode_hw_arg_t z);
 
+    gcode_hw_return_t (*m51)(gcode_hw_arg_t r,gcode_hw_arg_t g, gcode_hw_arg_t b);
 } gcode_hw_callbacks_struct;
 
 
