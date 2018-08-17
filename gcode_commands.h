@@ -35,6 +35,9 @@ gcode_status_t gcode_g91(char *args);
 
 gcode_status_t gcode_g92(char *args);
 
+gcode_status_t gcode_m51(char *args);
+
+gcode_status_t gcode_m52(char *args);
 
 #ifdef __cplusplus
 }

@@ -217,3 +217,19 @@ gcode_status_t gcode_m51(char *args) {
     }
     return GCODE_HARDWARE_DOES_NOT_SUPPORT;
 }
+
+gcode_status_t gcode_m52(char *args) {
+    static gcode_hw_arg_t
+            r = 0,
+            g = 0,
+            b = 0,
+            time = 1;
+    if (hw_callbacks->m52) {
+        gcode_status_t res = gcode_parse_vargs("RGBT", args, &r, &g, &b, &time);
+        if (res != GCODE_OK)
+            return res;
+        hw_callbacks->m52(r, g, b, time);
+
+    }
+    return GCODE_HARDWARE_DOES_NOT_SUPPORT;
+}

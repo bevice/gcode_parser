@@ -26,6 +26,8 @@ static const gcode_parser_struct callbacks[] = {
         {"G90", gcode_g90},
         {"G91", gcode_g91},
         {"G92", gcode_g92},
+        {"M51", gcode_m51},
+        {"M52", gcode_m52},
 };
 
 
