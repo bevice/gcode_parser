@@ -213,6 +213,7 @@ gcode_status_t gcode_m51(char *args) {
         if (res != GCODE_OK)
             return res;
         hw_callbacks->m51(r, g, b);
+        return GCODE_OK;
 
     }
     return GCODE_HARDWARE_DOES_NOT_SUPPORT;
@@ -229,6 +230,7 @@ gcode_status_t gcode_m52(char *args) {
         if (res != GCODE_OK)
             return res;
         hw_callbacks->m52(r, g, b, time);
+        return GCODE_OK;
 
     }
     return GCODE_HARDWARE_DOES_NOT_SUPPORT;
