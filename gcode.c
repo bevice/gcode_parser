@@ -153,6 +153,20 @@ gcode_status_t gcode_deinit() {
     return GCODE_OK;
 }
 
+void gcode_modify_values(gcode_hw_arg_t *args, int count, ...) {
+    va_list argptr;
+    va_start(argptr, count);
+    for(uint8_t i=0;i<count;i++)
+    {
+        gcode_hw_arg_t x = *args++;
+        gcode_hw_arg_t  * ptr = va_arg(argptr, gcode_hw_arg_t *);
+        if(x!=GCODE_NULL_VALUE)
+            *ptr = x;
+
+    }
+    va_end(argptr);
+}
+
 gcode_status_t gcode_command(gcode_command_struct *command, char *args) {
     // есть строка с аргументами
     size_t argv = strlen(command->arguments);

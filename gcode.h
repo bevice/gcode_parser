@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-
+#include <math.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,7 +21,7 @@ extern "C" {
 ///< Максимальное количество аргументов команды GCode и коллбека без динамической памяти
 #define _GCODE_MAX_ARGS 4
 ///Это значение передается в коллбек если соответствующий параметр команды был опущен в GCode
-#define GCODE_NULL_VALUE (9e99)
+#define GCODE_NULL_VALUE (INFINITY)
 
 /// тип аргумента передаваемого в коллбек
 #ifndef gcode_gw_arg_t
@@ -101,6 +101,14 @@ const char *gcode_get_error(gcode_status_t error);
  */
 gcode_status_t gcode_parse_line(char *line);
 
+/**
+ * * Обновить переменные значениями из args если они не равны GCODE_NULL_VALUE
+ * @param args указатель на первый элемент массива аргументов
+ * @param count количесво аргументов
+ * @param ... адреса переменных для обновления
+ * @example: gcode_modify_values(args, 3, &x, &y, &speed);
+ */
+void gcode_modify_values(gcode_hw_arg_t *args, int count, ...);
 #ifdef __cplusplus
 }
 #endif

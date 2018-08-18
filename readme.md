@@ -18,26 +18,15 @@ target_link_libraries(project_name gcode_parser)
 
 gcode_status_t g00(size_t argv, gcode_hw_arg_t *args) {
     static gcode_hw_arg_t x = 0, y = 0, speed = 0;
-    if (args[0] != GCODE_NULL_VALUE)
-        x = args[0];
-    if (args[1] != GCODE_NULL_VALUE)
-        y = args[1];
-
-    if (args[2] != GCODE_NULL_VALUE)
-        speed = args[2];
+    gcode_modify_values(args, 3, &x, &y, &speed);
 
     printf("G00 to x=%.2f, y=%.2f, speed=%.2f\n", x, y, speed);
     return GCODE_OK;
 }
 
 gcode_status_t g01(size_t argv, gcode_hw_arg_t *args) {
-    static gcode_hw_arg_t x = 0, y = 0, speed = 0;
-    if (args[0] != GCODE_NULL_VALUE)
-        x = args[0];
-    if (args[1] != GCODE_NULL_VALUE)
-        y = args[1];
-    if (args[2] != GCODE_NULL_VALUE)
-        speed = args[2];
+        static gcode_hw_arg_t x = 0, y = 0, speed = 0;
+        gcode_modify_values(args, 3, &x, &y, &speed);
 
     printf("G01 to x=%.2f, y=%.2f, speed=%.2f\n", x, y, speed);
     return GCODE_OK;
