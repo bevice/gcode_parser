@@ -14,7 +14,7 @@ target_link_libraries(project_name gcode_parser)
 
 ## Пример:
 
-````
+```c
 
 gcode_status_t g00(size_t argv, gcode_hw_arg_t *args) {
     static gcode_hw_arg_t x = 0, y = 0, speed = 0;
