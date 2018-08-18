@@ -14,10 +14,14 @@
 extern "C" {
 #endif
 
-typedef double gcode_hw_arg_t;
-typedef void gcode_hw_return_t;
+#define MAX_ARGS 4
 
-#define GCODE_NO_VALUE (9e99)
+#define GCODE_USE_DYNAMIC_MEMORY
+
+#define GCODE_NULL_VALUE (9e99)
+
+typedef float gcode_hw_arg_t;
+
 typedef enum {
     GCODE_OK = 0,
     GCODE_ARGUMENT_ERROR,
@@ -27,47 +31,25 @@ typedef enum {
     GCODE_STUB,
     GCODE_NOT_IMPLEMENTED,
     GCODE_HARDWARE_DOES_NOT_SUPPORT,
+    GCODE_CANT_ALLOCATE_MEMORY,
+    GCODE_NOT_INITED,
 } gcode_status_t;
 
 
-typedef gcode_status_t (*gcode_worker_f)(char *args);
+typedef gcode_status_t (*gcode_callback_t)(gcode_hw_arg_t * args);
 
 
 typedef struct {
     char *code;
-    gcode_worker_f callback;
-} gcode_parser_struct;
-
-typedef struct {
-    gcode_hw_return_t (*g00)(gcode_hw_arg_t x, gcode_hw_arg_t y, gcode_hw_arg_t z, gcode_hw_arg_t speed);
-    gcode_hw_return_t (*g01)(gcode_hw_arg_t x, gcode_hw_arg_t y, gcode_hw_arg_t z, gcode_hw_arg_t speed);
-
-    gcode_hw_return_t (*g04)(gcode_hw_arg_t time);
-
-    gcode_hw_return_t (*g15)(void);
-
-    gcode_hw_return_t (*g16)(void);
-
-    gcode_hw_return_t (*g20)(void);
-
-    gcode_hw_return_t (*g21)(void);
-
-    gcode_hw_return_t (*g90)(void);
-
-    gcode_hw_return_t (*g91)(void);
-
-    gcode_hw_return_t (*g92)(gcode_hw_arg_t x, gcode_hw_arg_t y, gcode_hw_arg_t z);
-
-    gcode_hw_return_t (*m51)(gcode_hw_arg_t r,gcode_hw_arg_t g, gcode_hw_arg_t b);
-
-    gcode_hw_return_t (*m52)(gcode_hw_arg_t r,gcode_hw_arg_t g, gcode_hw_arg_t b, gcode_hw_arg_t time);
-
-} gcode_hw_callbacks_struct;
+    char *arguments;
+    gcode_callback_t callback;
+} gcode_command_struct;
 
 
-void gcode_init(gcode_hw_callbacks_struct *hw_callbacks);
-
-const char *gcode_get_error(gcode_status_t error);
+gcode_status_t gcode_init(gcode_command_struct *init_struct, uint8_t commands_count);
+gcode_status_t gcode_deinit();
+const char *   gcode_get_error(gcode_status_t error);
+gcode_status_t gcode_parse_line(char *line);
 
 #ifdef __cplusplus
 }

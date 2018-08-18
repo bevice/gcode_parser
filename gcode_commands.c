@@ -13,86 +13,8 @@
 static gcode_hw_callbacks_struct *hw_callbacks = NULL;
 
 
-char *get_arg_value(char *args, gcode_hw_arg_t *value) {
-
-    gcode_hw_arg_t dummy_value;
-    if (!value) value = &dummy_value;
-    if (!args)return NULL;
-    if (*args == '\r' || *args == '\n')return args++;
-    // находим первую цифру в строке
-    while (*args && (*args < '0' || *args > '9') && *args != '-')
-        args++;
-    if (!*args) // вышли из цикла по концу строки, цифра не найдена
-        return NULL; // возвращаемся с ошибкой
-
-    // args указывает на начало аргумента
 
 
-    uint8_t flags = 0; // 0 бит - нашли точку, 1 бит - число отрицательное
-    float d = 10;
-    // начинаем разбирать
-    if (*args == '-') {
-        flags |= 1 << 1;
-        args++;
-    }
-    *value = 0;
-    while (*args && ((*args >= '0' && *args <= '9') || *args == '.')) {
-        if (*args == '.') {
-            if (flags & 1)
-                return NULL; // точка уже нашлась - ошибка аргумента
-            flags |= 1 << 0;
-        } else {
-            // приехала очередная цифра
-            if (flags & 1) // точка уже нашлась
-            {
-                *value += (*args - '0') / (float) d;
-                d *= 10.0;
-            } else
-                *value = *value * 10 + (*args - '0');
-        }
-        args++;
-    }
-    if (flags & 1 << 1)
-        *value = -*value;
-    return rstrip(args);
-}
-
-#define MAX_VARGS 4
-
-gcode_status_t gcode_parse_vargs(char *find, char *args, ...) {
-    va_list vl;
-    gcode_hw_arg_t *values[MAX_VARGS];
-    uint8_t i = 0;
-
-    va_start(vl, args);
-    while (find[i]) {
-        gcode_hw_arg_t *x = va_arg(vl, gcode_hw_arg_t*);
-        if (i < MAX_VARGS)
-            values[i] = x;
-        i++;
-    }
-    va_end(vl);
-
-    while (*args && *args != '\n' && *args != '\r') {
-        char argument = to_upper(*args);
-        uint8_t n = 0xFF;
-        //найдем аргумент в строке
-        for (i = 0; i < strlen(find); ++i)
-            if (to_upper(find[i]) == argument) {
-                n = i;
-                break;
-            }
-        gcode_hw_arg_t *t = NULL;
-        if (n != 0xFF)
-            t = values[n];
-        args = get_arg_value(args, t);
-        if (!args)
-            return GCODE_ARGUMENT_ERROR;
-    }
-    return GCODE_OK;
-
-
-}
 
 gcode_status_t gcode_g00(char *args) {
     static gcode_hw_arg_t x = 0, y = 0, z = 0, speed = 0;
