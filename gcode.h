@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 
-#define _GCODE_USE_DYNAMIC_MEMORY   ///< Использовать динамическую память
+//#define _GCODE_USE_DYNAMIC_MEMORY   ///< Использовать динамическую память
 #define _GCODE_CLEAN_ZEROES         ///< Убирать незначащие нули из кодов команд G01 -> G1
 
 ///< Максимальное количество аргументов команды GCode и коллбека без динамической памяти
@@ -51,7 +51,7 @@ typedef enum {
  * порядок передачи и количество зависит от порядка в элементе arguments gcode_command_struct
  * описывающей команду
  */
-typedef gcode_status_t (*gcode_callback_t)(size_t argv, gcode_hw_arg_t *args);
+typedef gcode_status_t (*gcode_callback_t)(size_t argc, gcode_hw_arg_t *args);
 
 
 /**
