@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.0)
-project(gcode_parse_test)
 
 set(CMAKE_CXX_STANDARD 14)
 
