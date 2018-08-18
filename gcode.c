@@ -51,7 +51,7 @@ const char *gcode_get_error(gcode_status_t error) {
 
 gcode_status_t gcode_init(gcode_command_struct *init_struct, uint8_t commands_count) {
     origin = init_struct;
-#ifdef GCODE_USE_DYNAMIC_MEMORY
+#ifdef _GCODE_USE_DYNAMIC_MEMORY
     if (commands_ptr)
         free(commands_ptr); // если уже инициализировались - забудем.
     size_t s = commands_count * sizeof(gcode_command_struct);
@@ -146,7 +146,7 @@ gcode_status_t gcode_parse_line(char *line) {
 }
 
 gcode_status_t gcode_deinit() {
-#ifdef GCODE_USE_DYNAMIC_MEMORY
+#ifdef _GCODE_USE_DYNAMIC_MEMORY
     if (commands_ptr)
         free(commands_ptr);
 #endif
@@ -157,7 +157,7 @@ gcode_status_t gcode_deinit() {
 
 gcode_status_t gcode_command(gcode_command_struct *command, char *args) {
     // есть строка с аргументами
-#ifdef GCODE_USE_DYNAMIC_MEMORY
+#ifdef _GCODE_USE_DYNAMIC_MEMORY
     gcode_hw_arg_t *data = malloc(sizeof(gcode_hw_arg_t) * strlen(command->arguments));
     if (!data)
         return GCODE_CANT_ALLOCATE_MEMORY;
@@ -187,7 +187,7 @@ gcode_status_t gcode_command(gcode_command_struct *command, char *args) {
     }
     gcode_status_t res = command->callback(data);
 
-#ifdef GCODE_USE_DYNAMIC_MEMORY
+#ifdef _GCODE_USE_DYNAMIC_MEMORY
     free(data); // не забудем освободить память
 
 #endif
@@ -202,6 +202,17 @@ gcode_status_t gcode_run_code(char *line) {
     if (!commands_ptr || !cmds_count)
         return GCODE_NOT_INITED;
     size_t code_len = gcode_argument_len(line);
+#ifdef _GCODE_CLEAN_ZEROES
+    // Уберем незначащие нули
+    while (code_len>2 && *(line+1) == '0'){
+        for(uint8_t i=1;i<code_len-1;i++)
+            *(line+i) = *(line+i+1);
+        code_len--;
+        *(line+code_len) = ' ';
+#endif // _GCODE_CLEAN_ZEROES
+
+    }
+
     for (uint8_t i = 0; i < cmds_count; ++i) {
         if (!strncmp(line, (commands_ptr + i)->code, code_len)) {
             gcode_clear_comment(line + code_len);

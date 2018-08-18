@@ -16,7 +16,8 @@ extern "C" {
 
 #define MAX_ARGS 4
 
-#define GCODE_USE_DYNAMIC_MEMORY
+#define _GCODE_USE_DYNAMIC_MEMORY
+#define _GCODE_CLEAN_ZEROES
 
 #define GCODE_NULL_VALUE (9e99)
 
