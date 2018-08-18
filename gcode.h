@@ -4,8 +4,8 @@
 * \authors Alexander A. Kuzkin <xbevice@gmail.com>
 */
 
-#ifndef _TEST_GCODE_H
-#define _TEST_GCODE_H
+#ifndef _GCODE_H
+#define _GCODE_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,15 +14,23 @@
 extern "C" {
 #endif
 
-#define MAX_ARGS 4
 
-#define _GCODE_USE_DYNAMIC_MEMORY
-#define _GCODE_CLEAN_ZEROES
+#define _GCODE_USE_DYNAMIC_MEMORY   ///< Использовать динамическую память
+#define _GCODE_CLEAN_ZEROES         ///< Убирать незначащие нули из кодов команд G01 -> G1
 
+///< Максимальное количество аргументов команды GCode и коллбека без динамической памяти
+#define _GCODE_MAX_ARGS 4
+///Это значение передается в коллбек если соответствующий параметр команды был опущен в GCode
 #define GCODE_NULL_VALUE (9e99)
 
+/// тип аргумента передаваемого в коллбек
+#ifndef gcode_gw_arg_t
 typedef float gcode_hw_arg_t;
+#endif
 
+/**
+ * Коды возврата
+ */
 typedef enum {
     GCODE_OK = 0,
     GCODE_ARGUMENT_ERROR,
@@ -37,19 +45,60 @@ typedef enum {
 } gcode_status_t;
 
 
-typedef gcode_status_t (*gcode_callback_t)(gcode_hw_arg_t * args);
+/**
+ * Прототип функции-коллбека
+ * Вызывается с ссылкой на массив аргументов args и количество аргументов argv
+ * порядок передачи и количество зависит от порядка в элементе arguments gcode_command_struct
+ * описывающей команду
+ */
+typedef gcode_status_t (*gcode_callback_t)(size_t argv, gcode_hw_arg_t *args);
 
 
+/**
+ * Структура описывающая реализованные команды GCode
+ */
 typedef struct {
-    char *code;
-    char *arguments;
-    gcode_callback_t callback;
+    char *code;                     ///< Код команды без значащих нулей "G1" "G0" "M300" и так далее
+    char *arguments;                ///< Аргументы которые может принимать команда "XYZF"
+    gcode_callback_t callback;      ///< Коллбек, который нужно дергать по команде
 } gcode_command_struct;
 
 
-gcode_status_t gcode_init(gcode_command_struct *init_struct, uint8_t commands_count);
+/**
+ * Инициализация парсера
+ * в функцию передается массив gcode_command_struct и количество элементов массива
+ * при определенном _GCODE_USE_DYNAMIC_MEMORY массив будет использован malloc() и memcpy для копирования
+ * массива,
+ * При неопределенной _GCODE_USE_DYNAMIC_MEMORY будет скопирован адрес переданного массива,
+ * поэтому массив не должнен выходить за область видимости пока модуль работает.
+ *
+ * @param init_struct структура с командами и коллбеками
+ * @param commands_count количество команд в структуре
+ * @return
+ */
+gcode_status_t gcode_init(const gcode_command_struct *init_struct, uint8_t commands_count);
+
+
+/**
+ * Деинициализация модуля и освобождение ресурсов в случае использования динамической памяти
+ * @return
+ */
 gcode_status_t gcode_deinit();
-const char *   gcode_get_error(gcode_status_t error);
+
+
+/**
+ * Расшифровка кода ошибки
+ * @param error код ошибки
+ * @return строка с расшифровкой ошибки
+ */
+const char *gcode_get_error(gcode_status_t error);
+
+
+/**
+ * Парсить очередную GCode строку
+ * @param line
+ * @return GCODE_OK (0) или код ошибки
+ */
 gcode_status_t gcode_parse_line(char *line);
 
 #ifdef __cplusplus
@@ -57,4 +106,4 @@ gcode_status_t gcode_parse_line(char *line);
 #endif
 
 
-#endif //_TEST_GCODE_H
+#endif //_GCODE_H

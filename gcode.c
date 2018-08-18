@@ -12,7 +12,6 @@
 #include "gcode_tools.h"
 
 static gcode_command_struct *commands_ptr = NULL;
-static gcode_command_struct *origin = NULL;
 static uint8_t cmds_count;
 
 static gcode_command_struct *last_command = NULL;
@@ -49,8 +48,7 @@ const char *gcode_get_error(gcode_status_t error) {
 }
 
 
-gcode_status_t gcode_init(gcode_command_struct *init_struct, uint8_t commands_count) {
-    origin = init_struct;
+gcode_status_t gcode_init(const gcode_command_struct *init_struct, uint8_t commands_count) {
 #ifdef _GCODE_USE_DYNAMIC_MEMORY
     if (commands_ptr)
         free(commands_ptr); // если уже инициализировались - забудем.
@@ -64,7 +62,7 @@ gcode_status_t gcode_init(gcode_command_struct *init_struct, uint8_t commands_co
     int test = memcmp(commands_ptr, init_struct, commands_count * sizeof(gcode_command_struct));
 
 #else
-    commands_ptr = init_struct;
+    commands_ptr = (gcode_command_struct*)init_struct;
 #endif
     cmds_count = commands_count;
     return GCODE_OK;
@@ -157,18 +155,22 @@ gcode_status_t gcode_deinit() {
 
 gcode_status_t gcode_command(gcode_command_struct *command, char *args) {
     // есть строка с аргументами
+    size_t argv = strlen(command->arguments);
 #ifdef _GCODE_USE_DYNAMIC_MEMORY
-    gcode_hw_arg_t *data = malloc(sizeof(gcode_hw_arg_t) * strlen(command->arguments));
+    gcode_hw_arg_t *data = malloc(sizeof(gcode_hw_arg_t) * argv);
     if (!data)
         return GCODE_CANT_ALLOCATE_MEMORY;
-#else
-    if(MAX_ARGS<strlen(command->arguments))
+#else // _GCODE_USE_DYNAMIC_MEMORY
+    if(_GCODE_MAX_ARGS<argv)
         return GCODE_BUFFER_TOO_SHORT;
-    gcode_hw_arg_t data[MAX_ARGS] = {0};
-#endif
+    gcode_hw_arg_t data[_GCODE_MAX_ARGS] = {0};
+#endif // _GCODE_USE_DYNAMIC_MEMORY
+
+    // заполняем значениями по-умолчанию
     for (uint8_t i = 0; i < strlen(command->arguments); ++i)
         data[i] = GCODE_NULL_VALUE;
 
+    // разбираем аргументы
     while (*args && *args != '\n' && *args != '\r') {
         char argument = to_upper(*args);
         uint8_t n = 0xFF;
@@ -185,12 +187,12 @@ gcode_status_t gcode_command(gcode_command_struct *command, char *args) {
         if (!args)
             return GCODE_ARGUMENT_ERROR;
     }
-    gcode_status_t res = command->callback(data);
+    gcode_status_t res = command->callback(argv, data);
 
 #ifdef _GCODE_USE_DYNAMIC_MEMORY
     free(data); // не забудем освободить память
 
-#endif
+#endif //_GCODE_USE_DYNAMIC_MEMORY
     return res;
 
 }
